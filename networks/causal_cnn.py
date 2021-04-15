@@ -73,6 +73,7 @@ class SqueezeChannels(torch.nn.Module):
         super(SqueezeChannels, self).__init__()
 
     def forward(self, x):
+        #2 indicates the third dimension
         return x.squeeze(2)
 
 

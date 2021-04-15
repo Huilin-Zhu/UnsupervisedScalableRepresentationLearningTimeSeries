@@ -517,7 +517,7 @@ class CausalCNNEncoderClassifier(TimeSeriesEncoderClassifier):
         evolution of the representations of the input time series with
         repect to time steps).
 
-        Takes advantage of the causal CNN (before the max pooling), wich
+        Takes advantage of the causal CNN (before the max pooling), which
         ensures that its output at time step i only depends on time step i and
         previous time steps.
 
