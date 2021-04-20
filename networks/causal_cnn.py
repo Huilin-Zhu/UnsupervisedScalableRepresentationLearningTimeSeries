@@ -96,7 +96,8 @@ class CausalConvolutionBlock(torch.nn.Module):
                  final=False):
         super(CausalConvolutionBlock, self).__init__()
 
-        # Computes left padding so that the applied convolutions are causal
+        # Computes left padding so that the applied convolutions are causal.
+        # Zero-padding added to both sides of the input
         padding = (kernel_size - 1) * dilation
 
         # First causal convolution
@@ -197,6 +198,7 @@ class CausalCNNEncoder(torch.nn.Module):
     @param out_channels Number of output channels.
     @param kernel_size Kernel size of the applied non-residual convolutions.
     """
+    # H: Input channels can be number of features. If univariate data, input channels = 1
     def __init__(self, in_channels, channels, depth, reduced_size,
                  out_channels, kernel_size):
         super(CausalCNNEncoder, self).__init__()

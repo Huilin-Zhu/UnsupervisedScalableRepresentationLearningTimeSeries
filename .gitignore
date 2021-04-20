@@ -1,0 +1,4 @@
+.ipynb_checkpoints/
+__pycache__/
+losses/__pycache__/
+networks/__pycache__/
