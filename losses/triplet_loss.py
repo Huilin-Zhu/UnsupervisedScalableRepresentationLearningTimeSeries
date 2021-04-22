@@ -202,6 +202,8 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
         # For each batch element, we pick nb_random_samples possible random
         # time series in the training set (choice of batches from where the
         # negative examples will be sampled)
+        # H: Generates a random sample from a given 1-D array, ie train_size.
+        # size is the number of samples drawn.
         samples = numpy.random.choice(
             train_size, size=(self.nb_random_samples, batch_size)
         )
@@ -209,6 +211,7 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
 
         # Computation of the lengths of the relevant time series
         with torch.no_grad():
+            # H: max_length - number of NaN (row-wise subtraction)
             lengths_batch = max_length - torch.sum(
                 torch.isnan(batch[:, 0]), 1
             ).data.cpu().numpy()
@@ -225,6 +228,7 @@ class TripletLossVaryingLength(torch.nn.modules.loss._Loss):
         lengths_neg = numpy.empty(
             (self.nb_random_samples, batch_size), dtype=int
         )
+        # H: high indicates that the length of chosen samples can not be higher than the length of the time series (NaN doesn't count as part of length of the time series)
         for j in range(batch_size):
             lengths_pos[j] = numpy.random.randint(
                 1, high=min(self.compared_length, lengths_batch[j]) + 1

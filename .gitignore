@@ -2,3 +2,4 @@
 __pycache__/
 losses/__pycache__/
 networks/__pycache__/
+hs_err_pid1748.log

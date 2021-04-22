@@ -98,6 +98,8 @@ class CausalConvolutionBlock(torch.nn.Module):
 
         # Computes left padding so that the applied convolutions are causal.
         # Zero-padding added to both sides of the input
+        # H: padding and chomp is used to preserve the length of the input
+        # vector so that the length is unchanged when it passes into the next conv1D
         padding = (kernel_size - 1) * dilation
 
         # First causal convolution
@@ -168,7 +170,7 @@ class CausalCNN(torch.nn.Module):
             )]
             dilation_size *= 2  # Doubles the dilation size at each step
 
-        # Last layer
+        # Last layer, H: special treatment because the out_channels here = 320, not 40 like before.
         layers += [CausalConvolutionBlock(
             channels, out_channels, kernel_size, dilation_size
         )]
@@ -190,7 +192,7 @@ class CausalCNNEncoder(torch.nn.Module):
     batch size, `C` is the number of input channels, and `L` is the length of
     the input. Outputs a three-dimensional tensor (`B`, `C`).
 
-    @param in_channels Number of input channels.
+    @param in_channels Number of input channels. H:Input channels is number of features. If univariate data, input channels = 1.
     @param channels Number of channels manipulated in the causal CNN.
     @param depth Depth of the causal CNN.
     @param reduced_size Fixed length to which the output time series of the
@@ -198,7 +200,6 @@ class CausalCNNEncoder(torch.nn.Module):
     @param out_channels Number of output channels.
     @param kernel_size Kernel size of the applied non-residual convolutions.
     """
-    # H: Input channels can be number of features. If univariate data, input channels = 1
     def __init__(self, in_channels, channels, depth, reduced_size,
                  out_channels, kernel_size):
         super(CausalCNNEncoder, self).__init__()
@@ -207,7 +208,7 @@ class CausalCNNEncoder(torch.nn.Module):
         )
         reduce_size = torch.nn.AdaptiveMaxPool1d(1)
         squeeze = SqueezeChannels()  # Squeezes the third dimension (time)
-        linear = torch.nn.Linear(reduced_size, out_channels)
+        linear = torch.nn.Linear(reduced_size, out_channels) # H: reduced_size != reduce_size above!
         self.network = torch.nn.Sequential(
             causal_cnn, reduce_size, squeeze, linear
         )
