@@ -87,7 +87,7 @@ class CausalConvolutionBlock(torch.nn.Module):
     the input. Outputs a three-dimensional tensor (`B`, `C`, `L`).
 
     @param in_channels Number of input channels.
-    @param out_channels Number of output channels.
+    @param out_channels Number of output channels. 'out_channels' is just the name of the parameter, they did not use 320. When they call this function, they passed in 'channels', ie 40. This is shown in line 169.
     @param kernel_size Kernel size of the applied non-residual convolutions.
     @param dilation Dilation parameter of non-residual convolutions.
     @param final Disables, if True, the last activation function.
@@ -193,11 +193,11 @@ class CausalCNNEncoder(torch.nn.Module):
     the input. Outputs a three-dimensional tensor (`B`, `C`).
 
     @param in_channels Number of input channels. H:Input channels is number of features. If univariate data, input channels = 1.
-    @param channels Number of channels manipulated in the causal CNN.
-    @param depth Depth of the causal CNN.
+    @param channels Number of channels manipulated in the causal CNN. User-defined. Default is 40.
+    @param depth Depth of the causal CNN. User-defined. Number of blocks and dialations on the whole network.
     @param reduced_size Fixed length to which the output time series of the
-           causal CNN is reduced.
-    @param out_channels Number of output channels.
+           causal CNN is reduced. User-defined. Default 160.
+    @param out_channels Number of output channels. User-defined. The length of final representation?
     @param kernel_size Kernel size of the applied non-residual convolutions.
     """
     def __init__(self, in_channels, channels, depth, reduced_size,
@@ -208,7 +208,7 @@ class CausalCNNEncoder(torch.nn.Module):
         )
         reduce_size = torch.nn.AdaptiveMaxPool1d(1)
         squeeze = SqueezeChannels()  # Squeezes the third dimension (time)
-        linear = torch.nn.Linear(reduced_size, out_channels) # H: reduced_size != reduce_size above!
+        linear = torch.nn.Linear(reduced_size, out_channels) # reduced_size =! reduce_size above. One is a module and this is an user-defined integer.
         self.network = torch.nn.Sequential(
             causal_cnn, reduce_size, squeeze, linear
         )
