@@ -23,6 +23,7 @@ import sklearn
 import sklearn.svm
 import sklearn.externals
 import sklearn.model_selection
+import joblib
 
 import utils
 import losses
@@ -110,7 +111,8 @@ class TimeSeriesEncoderClassifier(sklearn.base.BaseEstimator,
                '$(prefix_file)_$(architecture)_encoder.pth').
         """
         self.save_encoder(prefix_file)
-        sklearn.externals.joblib.dump(
+        # sklearn.externals.joblib.dump(
+        joblib.dump(
             self.classifier,
             prefix_file + '_' + self.architecture + '_classifier.pkl'
         )
@@ -142,7 +144,8 @@ class TimeSeriesEncoderClassifier(sklearn.base.BaseEstimator,
                and '$(prefix_file)_$(architecture)_encoder.pth').
         """
         self.load_encoder(prefix_file)
-        self.classifier = sklearn.externals.joblib.load(
+        # self.classifier = sklearn.externals.joblib.load(
+        self.classifier = joblib.load(
             prefix_file + '_' + self.architecture + '_classifier.pkl'
         )
 

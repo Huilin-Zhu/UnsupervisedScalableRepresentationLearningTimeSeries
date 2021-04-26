@@ -90,7 +90,7 @@ def load_UEA_dataset(path, dataset):
     train_labels = numpy.vectorize(transform.get)(train_labels)
     test_labels = numpy.vectorize(transform.get)(test_labels)
 
-    # weka.core.jvm.stop()
+    weka.core.jvm.stop()
     return train, train_labels, test, test_labels
 
 
