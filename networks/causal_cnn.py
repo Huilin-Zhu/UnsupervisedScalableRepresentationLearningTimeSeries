@@ -86,7 +86,7 @@ class CausalConvolutionBlock(torch.nn.Module):
     batch size, `C` is the number of input channels, and `L` is the length of
     the input. Outputs a three-dimensional tensor (`B`, `C`, `L`).
 
-    @param in_channels Number of input channels.
+    @param in_channels Number of input channels. Equals to the number of features (columns) of the dataset.
     @param out_channels Number of output channels. 'out_channels' is just the name of the parameter, they did not use 320. When they call this function, they passed in 'channels', ie 40. This is shown in line 169.
     @param kernel_size Kernel size of the applied non-residual convolutions.
     @param dilation Dilation parameter of non-residual convolutions.
@@ -151,9 +151,9 @@ class CausalCNN(torch.nn.Module):
 
     @param in_channels Number of input channels.
     @param channels Number of channels processed in the network and of output
-           channels.
+           channels. Default is 40.
     @param depth Depth of the network.
-    @param out_channels Number of output channels.
+    @param out_channels Number of output channels of CausalCNN. This is later aassigned to equal to reduced_size.
     @param kernel_size Kernel size of the applied non-residual convolutions.
     """
     def __init__(self, in_channels, channels, depth, out_channels,
@@ -178,7 +178,7 @@ class CausalCNN(torch.nn.Module):
         self.network = torch.nn.Sequential(*layers)
 
     def forward(self, x):
-        return self.network(x)
+        return self.network(x) # time series length returned is out_channels
 
 
 class CausalCNNEncoder(torch.nn.Module):
@@ -195,23 +195,27 @@ class CausalCNNEncoder(torch.nn.Module):
     @param in_channels Number of input channels. H:Input channels is number of features. If univariate data, input channels = 1.
     @param channels Number of channels manipulated in the causal CNN. User-defined. Default is 40.
     @param depth Depth of the causal CNN. User-defined. Number of blocks and dialations on the whole network.
-    @param reduced_size Fixed length to which the output time series of the
-           causal CNN is reduced. User-defined. Default 160.
-    @param out_channels Number of output channels. User-defined. The length of final representation?
+    @param reduced_size Number of output channels by CausalCnn. User-defined. Default 160.
+    @param out_channels Fixed length to which the output time series of the
+           causal CNN is reduced. The length of final representation. Default 320.
     @param kernel_size Kernel size of the applied non-residual convolutions.
     """
     def __init__(self, in_channels, channels, depth, reduced_size,
                  out_channels, kernel_size):
         super(CausalCNNEncoder, self).__init__()
         causal_cnn = CausalCNN(
+            # the output of CausalCNN length is reduced_size, because as we can see here, it is the fourth input parameter, and the fourth parameter defined in CausalCNN is out_channels, which is the output length of last layer in CausalCNN.
             in_channels, channels, depth, reduced_size, kernel_size
         )
+        # AdaptiveMaxPool1d doesn't change series length, so it's still of length reduced_size as of now.
         reduce_size = torch.nn.AdaptiveMaxPool1d(1)
+        # SqueezeChannels doesn't change series length, so it's still of length reduced_size as of now.
         squeeze = SqueezeChannels()  # Squeezes the third dimension (time)
-        linear = torch.nn.Linear(reduced_size, out_channels) # reduced_size =! reduce_size above. One is a module and this is an user-defined integer.
+        # torch.nn.Linear changes the length from reduced_size to out_channels
+        linear = torch.nn.Linear(reduced_size, out_channels)
         self.network = torch.nn.Sequential(
             causal_cnn, reduce_size, squeeze, linear
         )
 
     def forward(self, x):
-        return self.network(x)
+        return self.network(x) # returned length is out_channels, which equals to 320 by default.
