@@ -24,6 +24,9 @@ import sklearn
 import argparse
 import joblib
 
+
+import sys
+sys.path.append(os.getcwd())
 import uea
 import scikit_wrappers
 
