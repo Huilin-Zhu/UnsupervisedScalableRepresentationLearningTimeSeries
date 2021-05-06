@@ -16,6 +16,9 @@
 # under the License.
 
 
+import os
+import sys
+sys.path.append(os.getcwd())
 import torch
 import numpy
 

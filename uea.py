@@ -17,6 +17,8 @@
 
 
 import os
+import sys
+sys.path.append(os.getcwd())
 import json
 import math
 import torch
@@ -25,8 +27,6 @@ import argparse
 import weka.core.jvm
 import weka.core.converters
 
-import sys
-sys.path.append(os.getcwd())
 import scikit_wrappers
 
 

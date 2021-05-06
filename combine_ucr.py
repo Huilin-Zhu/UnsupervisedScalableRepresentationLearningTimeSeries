@@ -17,6 +17,8 @@
 
 
 import os
+import sys
+sys.path.append(os.getcwd())
 import json
 import numpy
 import torch
@@ -25,8 +27,6 @@ import argparse
 import joblib
 
 
-import sys
-sys.path.append(os.getcwd())
 import ucr
 import scikit_wrappers
 

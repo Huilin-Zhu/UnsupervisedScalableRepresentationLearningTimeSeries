@@ -16,6 +16,9 @@
 # under the License.
 
 
+import os
+import sys
+sys.path.append(os.getcwd())
 import math
 import numpy
 import torch
@@ -25,9 +28,6 @@ import sklearn.externals
 import sklearn.model_selection
 import joblib
 
-import os
-import sys
-sys.path.append(os.getcwd())
 import utils
 import losses
 import networks
